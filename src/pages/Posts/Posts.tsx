@@ -5,8 +5,22 @@ import { getPosts } from "../../api/api";
 
 const Posts = () => {
   const [posts, setPosts] = useState<PostsType[]>();
+  const [filteredPosts, setFilteredPosts] = useState<PostsType[]>();
+
   const deletePost = (id: number) => {
     setPosts(posts?.filter((post) => post.id !== id));
+  };
+
+  const filterPosts = (searchQuery: string) => {
+    if (searchQuery.trim() === "") {
+      setFilteredPosts(posts);
+    } else {
+      setFilteredPosts(
+        posts?.filter((post) =>
+          post.title.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      );
+    }
   };
 
   useEffect(() => {
@@ -14,6 +28,7 @@ const Posts = () => {
       try {
         const posts = await getPosts();
         setPosts(posts);
+        setFilteredPosts(posts);
       } catch (error) {
         console.error("Error fetching posts:", error);
       }
@@ -21,9 +36,15 @@ const Posts = () => {
 
     fetchData();
   }, []);
-  if (!posts) return null;
+  if (!filteredPosts) return null;
 
-  return <PostsCMP posts={posts} deletePost={deletePost} />;
+  return (
+    <PostsCMP
+      posts={filteredPosts}
+      deletePost={deletePost}
+      filterPosts={filterPosts}
+    />
+  );
 };
 
 export default Posts;
