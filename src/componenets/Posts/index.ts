@@ -1,0 +1,1 @@
+export { default as PostsCMP } from './Posts'
